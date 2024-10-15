@@ -1,11 +1,11 @@
 # CS 358
 # Alan Shirk - alans@pdx.edu
-# Exercise 1: Parser Generation and AST Processing
+# Exercise 2: Parser Generation and AST Processing
 
 from lark import Lark, v_args, Token
 from lark.visitors import Interpreter
 
-# Grammar
+# Lark grammar for calculator
 grammar = """
 ?start: expr
 ?expr: expr "+" term -> add
