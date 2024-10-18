@@ -1,4 +1,4 @@
-# <your name>
+# Alan Shirk
 #
 
 # CS358 Fall'24 Assignment 1 (Part B)
@@ -11,9 +11,25 @@ from lark.visitors import Interpreter
 # 1. Grammar
 #
 grammar = """
+?start: let_expr | expr
 
-    # ... need code
+let_expr: "let" ID "=" start "in" start -> let
 
+?expr: expr "+" term -> add
+    | expr "-" term -> sub
+    | term
+
+?term: term "*" atom -> mul
+    | term "/" atom -> div
+    | atom
+
+atom: ID -> var
+    | NUM -> num
+    | "(" start ")"
+
+%import common.CNAME -> ID
+%import common.INT -> NUM
+%ignore " "
 """
 
 # Parser
@@ -32,14 +48,22 @@ parser = Lark(grammar)
 # 2. Variable environment
 #
 class Env(dict):
-    def extend(self,x,v):
-        # ...
+    def extend(self, x, v):
+        new_env = Env(self)
+        new_env[x] = v
+        return new_env
 
     def lookup(self,x): 
-        # ... 
+        if x in self:
+            return self[x]
+        else:
+            raise NameError(f"Variable '{x}' not defined")
 
-    def retract(self,x):
-        # ...
+    def retract(self, x):
+        if x in self:
+            del self[x]
+        else:
+            raise NameError(f"Variable '{x}' not found")
 
 env = Env()
 
@@ -50,9 +74,31 @@ env = Env()
 #
 @v_args(inline=True)
 class Eval(Interpreter):
+    def __init__(self, env):
+        self.env = env
 
-    # ... need code
+    def let(self, var_name, value_expr, body_expr):
+        value = self.visit(value_expr)
+        new_env = self.env.extend(var_name, value)
+        return Eval(new_env).visit(body_expr)
 
+    def var(self, var_name):
+        return self.env.lookup(var_name)
+
+    def num(self, n):
+        return int(n)
+
+    def add(self, left, right):
+        return self.visit(left) + self.visit(right)
+
+    def sub(self, left, right):
+        return self.visit(left) - self.visit(right)
+
+    def mul(self, left, right):
+        return self.visit(left) * self.visit(right)
+
+    def div(self, left, right):
+        return self.visit(left) / self.visit(right)
 
 def main():
     while True:
@@ -61,7 +107,7 @@ def main():
             tree = parser.parse(expr)
             print(expr)
             print(tree.pretty(), end="")
-            print("tree.Eval() =", Eval().visit(tree))
+            print("tree.Eval() =", Eval(env).visit(tree))
             print()
         except EOFError:
             break
