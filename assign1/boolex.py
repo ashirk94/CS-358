@@ -83,13 +83,13 @@ class toList(Interpreter):
         return ['not', expr_list]
 
     def andop(self, left, right):
-        left_list = self.visit(left)
-        right_list = self.visit(right)
+        left_list = Eval().visit(left)
+        right_list = Eval().visit(right)
         return ['and', left_list, right_list]
 
     def orop(self, left, right):
-        left_list = self.visit(left)
-        right_list = self.visit(right)
+        left_list = Eval().visit(left)
+        right_list = Eval().visit(right)
         return ['or', left_list, right_list]
 
 # 4. Convert a nested list to a string form

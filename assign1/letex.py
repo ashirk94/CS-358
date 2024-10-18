@@ -48,9 +48,9 @@ parser = Lark(grammar)
 # 2. Variable environment
 #
 class Env(dict):
-    def extend(self, x, v):
+    def extend(self, x, val):
         new_env = Env(self)
-        new_env[x] = v
+        new_env[x] = val
         return new_env
 
     def lookup(self,x): 
@@ -89,16 +89,16 @@ class Eval(Interpreter):
         return int(n)
 
     def add(self, left, right):
-        return self.visit(left) + self.visit(right)
+        return Eval(self.env).visit(left) + Eval(self.env).visit(right)
 
     def sub(self, left, right):
-        return self.visit(left) - self.visit(right)
+        return Eval(self.env).visit(left) - Eval(self.env).visit(right)
 
     def mul(self, left, right):
-        return self.visit(left) * self.visit(right)
+        return Eval(self.env).visit(left) * Eval(self.env).visit(right)
 
     def div(self, left, right):
-        return self.visit(left) / self.visit(right)
+        return Eval(self.env).visit(left) / Eval(self.env).visit(right)
 
 def main():
     while True:
