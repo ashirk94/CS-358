@@ -6,19 +6,14 @@ from lark import Lark
 
 # Lark grammar for regex
 grammar = """
-?start: alt
+?start: seq
 
-?alt: seq ("|" seq)+
-    | seq
+seq: rep+
 
-?seq: rep (rep)+
-    | rep
+rep: LETTER STAR?
+    | "(" seq ")" STAR?
 
-rep: atom "*"
-    | atom
-
-?atom: "(" alt ")"
-    | LETTER
+STAR: "*"
 
 %import common.LETTER
 %ignore " "

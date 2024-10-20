@@ -48,22 +48,21 @@ parser = Lark(grammar)
 # 2. Variable environment
 #
 class Env(dict):
-    def extend(self, x, val):
-        new_env = Env(self)
-        new_env[x] = val
-        return new_env
-
-    def lookup(self,x): 
+    def extend(self, x, v):
         if x in self:
-            return self[x]
+            self[x].insert(0, v)
         else:
-            raise NameError(f"Variable '{x}' not defined")
+            self[x] = [v]
 
-    def retract(self, x):
-        if x in self:
-            del self[x]
-        else:
-            raise NameError(f"Variable '{x}' not found")
+    def lookup(self,x):
+        vals = super().get(x)
+        if not vals:
+            raise Exception("Undefined variable: " + x)
+        return vals[0]
+
+    def retract(self,x):
+        assert x in self, "Undefined variable: " + x
+        self[x].pop(0)
 
 env = Env()
 
@@ -77,13 +76,18 @@ class Eval(Interpreter):
     def __init__(self, env):
         self.env = env
 
-    def let(self, var_name, value_expr, body_expr):
-        value = self.visit(value_expr)
-        new_env = self.env.extend(var_name, value)
-        return Eval(new_env).visit(body_expr)
+    def let(self, x, value, body):
+        val = self.visit(value)
+        self.env.extend(x, val)
+        
+        result = self.visit(body)
+        
+        self.env.retract(x)
+        
+        return result
 
-    def var(self, var_name):
-        return self.env.lookup(var_name)
+    def var(self, id):
+        return self.env.lookup(id)
 
     def num(self, n):
         return int(n)
