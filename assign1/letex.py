@@ -1,6 +1,5 @@
 # Alan Shirk
 #
-
 # CS358 Fall'24 Assignment 1 (Part B)
 #
 # LetEx - an expression language with let binding
@@ -16,12 +15,12 @@ grammar = """
 let_expr: "let" ID "=" start "in" start -> let
 
 ?expr: expr "+" term -> add
-    | expr "-" term -> sub
-    | term
+     | expr "-" term -> sub
+     | term
 
 ?term: term "*" atom -> mul
-    | term "/" atom -> div
-    | atom
+     | term "/" atom -> div
+     | atom
 
 atom: ID -> var
     | NUM -> num
@@ -54,13 +53,13 @@ class Env(dict):
         else:
             self[x] = [v]
 
-    def lookup(self,x):
+    def lookup(self, x):
         vals = super().get(x)
         if not vals:
             raise Exception("Undefined variable: " + x)
         return vals[0]
 
-    def retract(self,x):
+    def retract(self, x):
         assert x in self, "Undefined variable: " + x
         self[x].pop(0)
 
@@ -93,16 +92,16 @@ class Eval(Interpreter):
         return int(n)
 
     def add(self, left, right):
-        return Eval(self.env).visit(left) + Eval(self.env).visit(right)
+        return self.visit(left) + self.visit(right)
 
     def sub(self, left, right):
-        return Eval(self.env).visit(left) - Eval(self.env).visit(right)
+        return self.visit(left) - self.visit(right)
 
     def mul(self, left, right):
-        return Eval(self.env).visit(left) * Eval(self.env).visit(right)
+        return self.visit(left) * self.visit(right)
 
     def div(self, left, right):
-        return Eval(self.env).visit(left) / Eval(self.env).visit(right)
+        return self.visit(left) / self.visit(right)
 
 def main():
     while True:

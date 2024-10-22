@@ -20,7 +20,7 @@ STAR: "*"
 """
 
 # Lark parser
-parser = Lark(grammar, start="start")
+parser = Lark(grammar)
 
 def main():
     while True:

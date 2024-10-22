@@ -1,6 +1,5 @@
 # Alan Shirk
 #
-
 # CS358 Fall'24 Assignment 1 (Part A)
 #
 # BoolEx - a Boolean expression language
@@ -14,34 +13,23 @@ grammar = """
 ?start: orex
 
 ?orex: orex "or" andex   -> orop
-    | andex
+     | andex
 
 ?andex: andex "and" atom -> andop
-     | atom
+      | atom
 
 ?atom: "not" atom        -> notop
-    | "(" orex ")"
-    | "True"            -> truev
-    | "False"           -> falsev
+     | "(" orex ")"
+     | "True"            -> truev
+     | "False"           -> falsev
 
 %ignore " "
 """
 # Parser
 #
-# E.g. (True or not False) and True
-#      => andop  
-#           orop
-#             truev
-#             notop
-#               falsev
-#           truev
-#
 parser = Lark(grammar)
 
 # 2. Interpreter
-#
-# E.g. (for the above example)
-#      => True
 #
 @v_args(inline=True)
 class Eval(Interpreter):
@@ -51,24 +39,21 @@ class Eval(Interpreter):
     def falsev(self):
         return False
 
-    def notop(self, left):
-        expr_val = Eval().visit(left)
+    def notop(self, expr):
+        expr_val = self.visit(expr)
         return not expr_val
 
     def andop(self, left, right):
-        left_val = Eval().visit(left)
-        right_val = Eval().visit(right)
+        left_val = self.visit(left)
+        right_val = self.visit(right)
         return left_val and right_val
 
     def orop(self, left, right):
-        left_val = Eval().visit(left)
-        right_val = Eval().visit(right)
+        left_val = self.visit(left)
+        right_val = self.visit(right)
         return left_val or right_val
 
 # 3. Convert the AST to a list form
-#
-# E.g. (for the above example)
-#      => ['and', ['or', 'True', ['not', 'False']], 'True']
 #
 @v_args(inline=True)
 class toList(Interpreter):
@@ -78,24 +63,21 @@ class toList(Interpreter):
     def falsev(self):
         return 'False'
 
-    def notop(self, left):
-        expr_list = Eval().visit(left)
+    def notop(self, expr):
+        expr_list = self.visit(expr)
         return ['not', expr_list]
 
     def andop(self, left, right):
-        left_list = Eval().visit(left)
-        right_list = Eval().visit(right)
+        left_list = self.visit(left)
+        right_list = self.visit(right)
         return ['and', left_list, right_list]
 
     def orop(self, left, right):
-        left_list = Eval().visit(left)
-        right_list = Eval().visit(right)
+        left_list = self.visit(left)
+        right_list = self.visit(right)
         return ['or', left_list, right_list]
 
 # 4. Convert a nested list to a string form
-#
-# E.g. (for the above example)
-#      => (and (or True (not False)) True)
 #
 def strForm(lst):
     if isinstance(lst, list):
