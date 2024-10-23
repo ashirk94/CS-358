@@ -24,7 +24,7 @@ let_expr: "let" ID "=" start "in" start -> let
 
 atom: ID -> var
     | NUM -> num
-    | "(" start ")"
+    | "(" expr ")" -> paren_expr
 
 %import common.CNAME -> ID
 %import common.INT -> NUM
@@ -75,12 +75,14 @@ class Eval(Interpreter):
     def __init__(self, env):
         self.env = env
 
-    def let(self, x, value, body):
-        val = self.visit(value)
+    def let(self, x, exp, body):
+        # Evaluating the let x binding's expression
+        val = self.visit(exp)
+        # Storing the binding into the current environment
         self.env.extend(x, val)
-        
+        # Evaluating the let construct's body expression
         result = self.visit(body)
-        
+        # Removing the binding from the environment
         self.env.retract(x)
         
         return result
@@ -102,6 +104,9 @@ class Eval(Interpreter):
 
     def div(self, left, right):
         return self.visit(left) / self.visit(right)
+    
+    def paren_expr(self, expr):
+        return self.visit(expr)
 
 def main():
     while True:
