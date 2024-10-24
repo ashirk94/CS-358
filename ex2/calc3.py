@@ -9,13 +9,13 @@ from lark.visitors import Interpreter
 grammar = """
 ?start: expr
 ?expr: expr "+" term -> add
-     | expr "-" term -> sub
-     | term
+    | expr "-" term -> sub
+    | term
 ?term: term "*" atom -> mul
-     | term "/" atom -> div
-     | atom
+    | term "/" atom -> div
+    | atom
 ?atom: "(" expr ")"
-     | NUM -> num
+    | NUM -> num
 
 %import common.INT -> NUM
 %ignore " "

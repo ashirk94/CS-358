@@ -10,21 +10,22 @@ from lark.visitors import Interpreter
 # 1. Grammar
 #
 grammar = """
-?start: let_expr | expr
+?start: expr0
 
-let_expr: "let" ID "=" start "in" start -> let
+?expr0: "let" ID "=" expr0 "in" expr0 -> let
+    | expr
 
 ?expr: expr "+" term -> add
-     | expr "-" term -> sub
-     | term
+    | expr "-" term -> sub
+    | term
 
 ?term: term "*" atom -> mul
-     | term "/" atom -> div
-     | atom
+    | term "/" atom -> div
+    | atom
 
-atom: ID -> var
+?atom: "(" expr0 ")"
     | NUM -> num
-    | "(" expr ")" -> paren_expr
+    | ID -> var
 
 %import common.CNAME -> ID
 %import common.INT -> NUM
@@ -104,9 +105,6 @@ class Eval(Interpreter):
 
     def div(self, left, right):
         return self.visit(left) / self.visit(right)
-    
-    def paren_expr(self, expr):
-        return self.visit(expr)
 
 def main():
     while True:

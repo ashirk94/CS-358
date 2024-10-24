@@ -13,23 +13,34 @@ grammar = """
 ?start: orex
 
 ?orex: orex "or" andex   -> orop
-     | andex
+    | andex
 
 ?andex: andex "and" atom -> andop
-      | atom
+    | atom
 
 ?atom: "not" atom        -> notop
-     | "(" orex ")"
-     | "True"            -> truev
-     | "False"           -> falsev
+    | "(" orex ")"
+    | "True"            -> truev
+    | "False"           -> falsev
 
 %ignore " "
 """
 # Parser
 #
+# E.g. (True or not False) and True
+#      => andop  
+#           orop
+#             truev
+#             notop
+#               falsev
+#           truev
+#
 parser = Lark(grammar)
 
 # 2. Interpreter
+#
+# E.g. (for the above example)
+#      => True
 #
 @v_args(inline=True)
 class Eval(Interpreter):
@@ -55,6 +66,9 @@ class Eval(Interpreter):
 
 # 3. Convert the AST to a list form
 #
+# E.g. (for the above example)
+#      => ['and', ['or', 'True', ['not', 'False']], 'True']
+#
 @v_args(inline=True)
 class toList(Interpreter):
     def truev(self):
@@ -78,6 +92,9 @@ class toList(Interpreter):
         return ['or', left_list, right_list]
 
 # 4. Convert a nested list to a string form
+#
+# E.g. (for the above example)
+#      => (and (or True (not False)) True)
 #
 def strForm(lst):
     if isinstance(lst, list):

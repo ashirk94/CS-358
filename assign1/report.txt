@@ -1,0 +1,4 @@
+Assignment 1 Report
+Alan Shirk
+
+All of my test cases produce the correct output for both the boolean expression language and the let expression language. Implementing the boolex string form function was challenging at first until I figured out I could process the child AST nodes first using recursion. The basic boolex interpreter functions were straightforward. For the letex environment, I used the mutable dict implementation with "stacks". I ran into some unexpected behavior with the letex interpreter at first, but after consulting the relevant lecture notes I finished the let expression function and was able to print the correct ASTs and evaluations of the expressions. For both languages I tested nesting within parentheses, and I made sure to test each operator. I also tested nested let expressions for the let expression language.

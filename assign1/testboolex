@@ -2,4 +2,4 @@
 False or True or not (False and True)
 True or False
 not (True and False)
-not True or False
+not (True or (False and False))
