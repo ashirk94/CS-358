@@ -1,0 +1,69 @@
+CS 358
+Alan Shirk - alans@pdx.edu
+Exercise 4: Operator Semantics and Grammar Encoding
+
+1.
+(a) 5 * 2 == 10 or 20
+The expression evaluates to True.
+
+(b) Python precedence order:
+*, /
++, -
+<, <=, >, >=, !=, ==
+not
+and
+or
+
+C precedence order:
+!
+*, /
++, -
+<, <=
+>, >=
+==, !=
+&&
+||
+
+(c) The C precedence order has the logical operator NOT as the operator with the highest precedence in the list while in Python its precedence is under all of the arithmetic and relational operators. Instead it is grouped with the other logical operators. C also assigns different precedence levels to the relational operators, while in Python they all have the same precedence.
+
+2.
+In Python, a rop1 b rop2 c is equivalent to (a rop1 b) and (b rop2 c).
+In C, a rop1 b rop2 c is equivalent to (a rop1 b) rop2 c.
+
+3.
+orex -> orex "or" andex
+        | andex
+
+andex -> andex "and" notex
+        | notex
+
+notex -> "not" relex
+        | relex
+
+relex -> relex relop expr
+        | expr
+
+expr -> expr "+" term
+        | expr "-" term
+        | term
+
+term -> term "*" atom
+        | term "/" atom
+        | atom
+
+atom -> "(" expr ")"
+        | NUM
+        | BOOL
+
+relop -> "<" | "<=" | ">" | ">=" | "==" | "!="
+
+BOOL -> "True" | "False"
+
+4.
+(a) No, the parser matches the dangling else with the outer if, not the inner if.
+
+(b) 
+(i) Yes, this parser matches the dangling else with the inner if.
+(ii) No, this parser matches the dangling else with the outer if.
+
+(c) The LALR parsing algorithm matched the dangling else with the inner if with both of the grammars in part (b), this suggests that the LALR parsing algorithm handles the dangling else ambiguity more consistently. With the grammar in part (a), it still matches the dangling else with the outer if.
