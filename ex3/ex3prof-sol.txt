@@ -1,0 +1,33 @@
+#------------------------------------------------------------------------------ 
+# For CS358 Principles of Programming Languages, Portland State University (JL)
+#------------------------------------------------------------------------------ 
+
+# Exercise 3 Solutions
+#
+
+1. (a) top(.*top)? 
+   (b) .*top.*pot.*|.*pot.*top.*
+   (c) (t[^t]+|[^t])*t?
+
+2. (a) 0x[0-9a-f]+
+   (b) 0[0-7]*[0246], 0|((1-9)[0-9]*)?[02468], 0x[0-9a-f]*[02468ace]
+
+3. (a) Sequences of alternating xs and +s, starting and ending with x.
+   (b) It's ambiguous. x+x+x can have two distinct parse trees.
+   (c) E -> x + E | x
+   (d) (x+)*x
+
+4. "if e then if e then other else other"
+
+   i.  S -> if e then S else S 
+         -> if e then if e then S else S
+         -> if e then if e then other else S
+         -> if e then if e then other else other
+
+   ii. S -> if e then S
+         -> if e then if e then S else S
+         -> if e then if e then other else S
+         -> if e then if e then other else other
+
+5. (a) S -> () | (S)
+   (b) S -> () | [] | (S) | [S]

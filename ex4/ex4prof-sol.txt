@@ -1,0 +1,38 @@
+Exercise 4 Solutions
+
+1. (a) 1 + 2 < 4 and True
+
+   (b) Python: (1) *, / (2) +, - (3) <, <=, >, >=, !=, == (4) not (5) and (6) or
+       C:      (1) ! (2) *, / (3) +, - (4) <, <=, >, >= (5) !=, == (6) && (7) ||
+
+   (c) Yes. Python's relation ops all belong to the same level, and the three 
+       logical ops are at the lowerest levels. C's relation ops are split into 
+       two levels, and its logical not(!) is placed at the highest level.
+       An example of different behavior:
+         Python: not 2 > 3 => True 
+         C:      ! 2 > 3   => 0 (false)
+
+2. Python: a rop1 b rop2 c = (a rop1 b) and (b rop2 c)
+   C:      a rop1 b rop2 c = (a rop1 b) rop2 c
+
+3. orex  -> orex "or" andex
+         |  andex
+   andex -> andex "and" notex
+         |  notex
+   notex -> "not" notex
+         |  relex
+   relex -> expr rop expr
+         |  expr
+   expr -> expr "+" term
+        |  expr "-" term
+        |  term         
+   term -> term "*" atom
+        |  term "/" atom
+        |  atom
+   atom -> "(" orex ")"
+        |  NUM
+   rop  -> "<"|"<="|">"|">="|"=="|"!="
+
+4. (a) No, it does not match the dangling-else with the inner if.
+   (b) i. Yes, ii. No.
+   (c) With LALR parser, yes for all cases.
