@@ -80,7 +80,6 @@ class Eval(Interpreter):
     def notop(self, x): 
         return not self.visit(x)
     
-    @v_args(inline=True)
     def relex(self, expr, *tail):
         left = self.visit(expr)
         i = 0

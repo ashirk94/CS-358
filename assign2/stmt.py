@@ -31,7 +31,7 @@ from lark.visitors import Interpreter
 # Grammar
 #
 grammar = """
-  ?start: stmt (";" stmt)* [";"]
+  ?start: stmt
 
   ?stmt: ID "=" expr                          -> assign
        | "if" "(" expr ")" stmt ["else" stmt] -> if_stmt
@@ -39,12 +39,7 @@ grammar = """
        | "print" "(" expr ")"                 -> print_stmt
        | "{" (stmt (";" stmt)* [";"])? "}"    -> block
 
-  ?expr: expr "<=" term                       -> le
-       | expr "<" term                        -> lt
-       | expr ">=" term                       -> ge
-       | expr ">" term                        -> gt
-       | expr "==" term                       -> eq
-       | expr "!=" term                       -> ne
+  ?expr: expr REL_OP term                     -> relop
        | expr "+" term                        -> add
        | expr "-" term                        -> sub
        | term
@@ -56,6 +51,8 @@ grammar = """
   ?atom: "(" expr ")"
        | ID                                   -> var
        | NUM                                  -> num
+
+  REL_OP: "<" | "<=" | ">" | ">=" | "==" | "!="
 
   %import common.WORD   -> ID
   %import common.INT    -> NUM
@@ -119,23 +116,24 @@ class Eval(Interpreter):
             else:
                 self.visit(stmt)
 
-    def le(self, x, y): 
-        return self.visit(x) <= self.visit(y)
-
-    def lt(self, x, y): 
-        return self.visit(x) < self.visit(y)
-
-    def ge(self, x, y): 
-        return self.visit(x) >= self.visit(y)
-
-    def gt(self, x, y): 
-        return self.visit(x) > self.visit(y)
-
-    def eq(self, x, y): 
-        return self.visit(x) == self.visit(y)
-
-    def ne(self, x, y): 
-        return self.visit(x) != self.visit(y)
+    def relop(self, left, op_token, right):
+        left_val = self.visit(left)
+        right_val = self.visit(right)
+        op = op_token.value
+        if op == '<':
+            return left_val < right_val
+        elif op == '<=':
+            return left_val <= right_val
+        elif op == '>':
+            return left_val > right_val
+        elif op == '>=':
+            return left_val >= right_val
+        elif op == '==':
+            return left_val == right_val
+        elif op == '!=':
+            return left_val != right_val
+        else:
+            raise Exception(f"Unknown operator {op}")
 
 def main():
     try:

@@ -1,6 +1,5 @@
 # Alan Shirk
 #
-
 # CS358 Fall'24 Assignment 2 (Part A)
 #
 # Expr - an expression language with arithmetic, logical, and 
@@ -24,13 +23,8 @@ grammar = """
   ?notex: "not" notex          -> notop
         | relex
 
-  ?relex: expr "<" expr        -> lt
-        | expr "<=" expr       -> le
-        | expr ">" expr        -> gt
-        | expr ">=" expr       -> ge
-        | expr "==" expr       -> eq
-        | expr "!=" expr       -> ne
-        | expr
+  ?relex: expr REL_OP expr     -> relop
+       | expr
 
   ?expr: expr "+" term         -> add
        | expr "-" term         -> sub
@@ -44,6 +38,8 @@ grammar = """
        | NUM                   -> num
        | "True"                -> true
        | "False"               -> false
+
+  REL_OP: "<" | "<=" | ">" | ">=" | "==" | "!="
 
   %import common.INT           -> NUM
   %ignore " "
@@ -84,25 +80,27 @@ class Eval(Interpreter):
 
     def notop(self, x): 
         return not self.visit(x)
-    
-    def lt(self, x, y): 
-        return self.visit(x) < self.visit(y)
 
-    def le(self, x, y): 
-        return self.visit(x) <= self.visit(y)
+    def relop(self, left, op_token, right):
+        left = self.visit(left)
+        right = self.visit(right)
+        op = op_token.value
 
-    def gt(self, x, y): 
-        return self.visit(x) > self.visit(y)
+        if op == '<':
+            return left < right
+        elif op == '<=':
+            return left <= right
+        elif op == '>':
+            return left > right
+        elif op == '>=':
+            return left >= right
+        elif op == '==':
+            return left == right
+        elif op == '!=':
+            return left != right
+        else:
+            raise Exception(f"Unknown operator: {op}")
 
-    def ge(self, x, y): 
-        return self.visit(x) >= self.visit(y)
-
-    def eq(self, x, y): 
-        return self.visit(x) == self.visit(y)
-
-    def ne(self, x, y): 
-        return self.visit(x) != self.visit(y)
-    
 def main():
     try:
         prog = input("Enter an expr: ")
