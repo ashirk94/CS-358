@@ -1,10 +1,9 @@
 # Alan Shirk
 #
-
-# CS358 Fall'24 Assignment 2 (Part A)
+# CS358 Fall'24 Assignment 2 (Part C)
 #
-# Expr - an expression language with arithmetic, logical, and 
-#        relational operations
+# Expr2 - an expression language with arithmetic, logical, and 
+#        relational operations with chained relational operators
 #
 
 from lark import Lark, v_args
@@ -24,13 +23,7 @@ grammar = """
   ?notex: "not" notex          -> notop
         | relex
 
-  ?relex: expr "<" expr        -> lt
-        | expr "<=" expr       -> le
-        | expr ">" expr        -> gt
-        | expr ">=" expr       -> ge
-        | expr "==" expr       -> eq
-        | expr "!=" expr       -> ne
-        | expr
+  ?relex: expr (REL_OP expr)*
 
   ?expr: expr "+" term         -> add
        | expr "-" term         -> sub
@@ -44,6 +37,8 @@ grammar = """
        | NUM                   -> num
        | "True"                -> true
        | "False"               -> false
+
+  REL_OP: "<" | "<=" | ">" | ">=" | "==" | "!="
 
   %import common.INT           -> NUM
   %ignore " "
@@ -85,24 +80,39 @@ class Eval(Interpreter):
     def notop(self, x): 
         return not self.visit(x)
     
-    def lt(self, x, y): 
-        return self.visit(x) < self.visit(y)
+    @v_args(inline=True)
+    def relex(self, expr, *tail):
+        left = self.visit(expr)
+        i = 0
+        while i < len(tail):
+            op_token = tail[i]
+            right_expr = tail[i + 1]
+            right = self.visit(right_expr)
+            op = op_token.value
 
-    def le(self, x, y): 
-        return self.visit(x) <= self.visit(y)
+            if op == '<':
+                result = left < right
+            elif op == '<=':
+                result = left <= right
+            elif op == '>':
+                result = left > right
+            elif op == '>=':
+                result = left >= right
+            elif op == '==':
+                result = left == right
+            elif op == '!=':
+                result = left != right
+            else:
+                raise Exception(f"Unknown operator {op}")
 
-    def gt(self, x, y): 
-        return self.visit(x) > self.visit(y)
+            if not result:
+                return False
 
-    def ge(self, x, y): 
-        return self.visit(x) >= self.visit(y)
+            left = right
+            i += 2
 
-    def eq(self, x, y): 
-        return self.visit(x) == self.visit(y)
+        return True
 
-    def ne(self, x, y): 
-        return self.visit(x) != self.visit(y)
-    
 def main():
     try:
         prog = input("Enter an expr: ")

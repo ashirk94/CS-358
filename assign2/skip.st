@@ -1,0 +1,1 @@
+{ n = 4; k = 3; while (n >= 1) { if (n != k) { print(n); }; n = n - 1; }; }
