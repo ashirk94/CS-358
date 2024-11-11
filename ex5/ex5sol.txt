@@ -1,0 +1,27 @@
+Alan Shirk
+Exercise 5: Parameter Passing and More Environments
+
+1.
+y = 1
+y = 1 + 1 = 2
+x = 1 + 2 = 3
+y = 2
+Call by value: (3, 2), 2
+
+y = 1
+y = 1 + 1 = 2
+x = 2 + 2 = 4
+y = 4
+Call by reference: (4, 4), 4
+
+y = 1
+y = 1 + 1 = 2
+x = 1 + 2 = 3
+y = 3
+Call by value result: (3, 2), 3
+
+y = 1
+y = y + 1 = 1 + 1 = 2
+x = y + y = 2 + 2 = 4
+y = 4
+Call by name: (4, 4), 4
