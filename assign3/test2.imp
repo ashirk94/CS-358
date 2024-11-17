@@ -1,0 +1,8 @@
+{ var x = 1; 
+  { var y = x+1;
+    { var x = y+2;
+      print(x+y) 
+    };
+    print(x+y) 
+  } 
+}
