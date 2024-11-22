@@ -94,13 +94,13 @@ class Eval(Interpreter):
         return self.visit(x) // self.visit(y)
 
     def if_stmt(self, condition, true_stmt, false_stmt=None):
-        if self.visit(condition) != False:
+        if self.visit(condition):
             return self.visit(true_stmt)
         elif false_stmt:
             return self.visit(false_stmt)
 
     def while_stmt(self, condition, body):
-        while self.visit(condition) != False:
+        while self.visit(condition):
             self.visit(body)
 
     def print_stmt(self, expr):

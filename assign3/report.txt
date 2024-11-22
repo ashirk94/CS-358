@@ -1,0 +1,4 @@
+Assignment 3 Report
+Alan Shirk
+
+Implang1 works correctly with the test1.imp and test2.imp. This established that the variable declarations and assignments are working properly with block statements. Implang2 also works correctly with all of my test programs that included if statements, relational operators, and for loops. I was able to write all of the required programs but prime.imp was difficult to write. First I made a Python version of the program but I used a break statement to break out of the loop when a divisor was found. Since there is no break statement in implang2 I figured out that I could divide "num" by 2 in order to stop the loop from continuing and flagging prime numbers as not prime. Also I had to implement the modulo operator in the grammar and the interpreter. Overall it was fascinating to learn how to create a programming language with conditional checks, for loops, and multi-line block statements.

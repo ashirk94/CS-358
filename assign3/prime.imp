@@ -1,0 +1,12 @@
+var bound = 10
+for num in [2..bound] {
+  var isPrime = 1;
+  for div in [2..num / 2 + 1] {
+    if (num % div == 0) {
+      isPrime = 0
+    }
+  };
+  if (isPrime == 1) {
+    print(num)
+  }
+}

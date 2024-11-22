@@ -1,57 +1,49 @@
 # Alan Shirk
 #
 
-# CS358 Fall'24 Assignment 3 (Part A)
+# CS358 Fall'24 Assignment 3 (Part B)
 #
-# ImpLang - a simple imperative language with nested scopes
+# ImpLang2
 
-# ImpLang - an imperative language
-#
-#   prog -> stmt
-#
-#   stmt -> "var" ID "=" expr
-#         | ID "=" expr 
-#         | "if" "(" expr ")" stmt ["else" stmt]
-#         | "while" "(" expr ")" stmt
-#         | "print" "(" expr ")"
-#         | "{" stmt (";" stmt)* "}" 
-#
-#   expr -> expr "+" term
-#         | expr "-" term
-#         | term         
-#
-#   term -> term "*" atom
-#         | term "/" atom
-#         | atom
-#
-#   atom: "(" expr ")"
-#         | ID
-#         | NUM
-#
 from lark import Lark, v_args
 from lark.visitors import Interpreter
 
 grammar = """
-  ?start: stmt+
+?start: stmt+
 
-   stmt: "var" ID "=" expr         -> decl
-       | ID "=" expr               -> assign
-       | "if" "(" expr ")" stmt ["else" stmt] -> ifstmt
-       | "while" "(" expr ")" stmt -> whstmt
-       | "print" "(" expr ")"      -> prstmt
-       | "{" stmt (";" stmt)* "}"  -> block      
+stmt: "var" ID "=" expr              -> decl
+    | ID "=" expr                    -> assign
+    | "if" "(" expr ")" stmt ["else" stmt] -> ifstmt
+    | "while" "(" expr ")" stmt      -> whstmt
+    | "for" ID "in" range stmt       -> forloop
+    | "print" "(" expr ")"           -> prstmt
+    | "{" stmt (";" stmt)* "}"       -> block
 
-  ?expr: expr "+" term  -> add
-       | expr "-" term  -> sub
-       | term         
+?range: "[" expr ".." expr "]"       -> rangeexpr
 
-  ?term: term "*" atom  -> mul
-       | term "/" atom  -> div
-       | atom
+?expr: expr "or" andexpr             -> orop
+     | andexpr
 
-  ?atom: "(" expr ")"
-       | ID             -> var
-       | NUM            -> num
+?andexpr: andexpr "and" relexpr      -> andop
+        | relexpr
+
+?relexpr: aexpr "<" aexpr    -> lt
+        | aexpr "==" aexpr   -> eq
+        | aexpr "!=" aexpr   -> neq
+        | aexpr
+
+?aexpr: aexpr "+" term       -> add
+          | aexpr "-" term       -> sub
+          | term
+
+?term: term "*" atom                  -> mul
+     | term "/" atom                  -> div
+     | term "%" atom                  -> mod
+     | atom
+
+?atom: "(" aexpr ")"
+     | ID                             -> var
+     | NUM                            -> num
 
   %import common.WORD   -> ID
   %import common.INT    -> NUM
@@ -130,6 +122,9 @@ class Eval(Interpreter):
 
     def div(self, left, right):
         return self.visit(left) // self.visit(right)
+    
+    def mod(self, left, right):
+        return self.visit(left) % self.visit(right)
 
     def decl(self, name, value):
         self.env.extend(name, self.visit(value))
@@ -155,6 +150,41 @@ class Eval(Interpreter):
         for stmt in stmts:
             self.visit(stmt)
         self.env = self.env.closeScope()
+
+    def lt(self, left, right):
+        return self.visit(left) < self.visit(right)
+
+    def eq(self, left, right):
+        return self.visit(left) == self.visit(right)
+    
+    def neq(self, left, right):
+        return self.visit(left) != self.visit(right)
+    
+    def rangeexpr(self, lo, hi):
+        lo_val = self.visit(lo)
+        hi_val = self.visit(hi)
+        return range(lo_val, hi_val)
+    
+    def forloop(self, loop_var, range_expr, stmt):
+        range_values = self.visit(range_expr)
+        self.env = self.env.openScope()
+
+        for value in range_values:
+            if loop_var in self.env:
+                self.env.update(loop_var, value)
+            else:
+                self.env.extend(loop_var, value)
+            self.visit(stmt)     
+
+        self.env = self.env.closeScope()
+
+    def andop(self, left, right):
+        return self.visit(left) and self.visit(right)
+
+    def orop(self, left, right):
+        return self.visit(left) or self.visit(right)
+
+
 
 # A new input routine - sys.stdin.read() 
 # - It allows source program be written in multiple lines
