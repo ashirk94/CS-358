@@ -1,0 +1,23 @@
+#------------------------------------------------------------------------------ 
+# For CS358 Principles of Programming Languages, Portland State University (JL)
+#------------------------------------------------------------------------------ 
+
+# Exercise 6 Solutions
+#
+
+1. def currying(f): return lambda x: lambda y: f(x,y)
+
+2. def ktimes(f,n): 
+       if n < 1: return lambda x: x
+       else:     return lambda x: ktimes(f,n-1)(f(x))
+
+3. def mymap(f,itr): 
+       match itr:
+           case list():  return [f(i) for i in itr]
+           case tuple(): return tuple(f(i) for i in itr)
+           case set():   return {f(i) for i in itr}
+           case str():   return ''.join([f(i) for i in itr])
+           case _: return None
+
+4. (a) fib is still called recursively in fib.s, but fibT is not.
+   (b) 'fibT 40' is much faster (>6 times on one machine) than 'fib 40'.

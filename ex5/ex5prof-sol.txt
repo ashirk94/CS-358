@@ -1,0 +1,32 @@
+#------------------------------------------------------------------------------ 
+# For CS358 Principles of Programming Languages, Portland State University (JL)
+#------------------------------------------------------------------------------ 
+
+# Exercise 5 Solutions
+#
+
+1. call-by-value: 3,2,2        
+   call-by-reference: 4,4,4
+   call-by-value-result: 3,2,3
+   call-by-name: 4,4,4
+
+2. Env(dict):
+    prev = [] 
+    def openScope(self):
+        self.prev.insert(0,self)
+        return Env()
+    def closeScope(self):
+        return self.prev.pop(0)
+    def extend(self,x,v): 
+        assert not x in self, "Variable already defined: " + x
+        self[x] = v
+    def lookup(self,x): 
+        if x in self: return self[x]
+        for envi in self.prev:
+            if x in envi: return envi[x]
+        raise Exception("Variable undefined: " + x)
+    def update(self,x,v):
+        if x in self: self[x] = v; return
+        for envi in self.prev:
+            if x in envi: envi[x] = v; return
+        raise Exception("Variable undefined: " + x)
