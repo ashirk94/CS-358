@@ -4,13 +4,13 @@
 
 class A:
     x = 1
-#    def __init__(self): 
-#        self.x = 2
-#        print('init A')
+    def __init__(self): 
+       self.x = 2
+       print('init A')
 
 class C(A):
-#    def __init__(self): 
-#        print('init C')
+    def __init__(self): 
+       print('init C')
     pass
 
 if __name__ == "__main__":
