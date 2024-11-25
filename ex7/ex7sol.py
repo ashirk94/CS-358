@@ -11,7 +11,7 @@ class Var(LambdaExpr):
     def __init__(self, name):
         self.name = name
 
-    def __repr__(self):
+    def __str__(self):
         return self.name
 
 class Def(LambdaExpr):
@@ -19,7 +19,7 @@ class Def(LambdaExpr):
         self.param = param
         self.body = body
 
-    def __repr__(self):
+    def __str__(self):
         return f"λ{self.param}.{self.body}"
 
 class App(LambdaExpr):
@@ -27,11 +27,11 @@ class App(LambdaExpr):
         self.funcExpr = funcExpr
         self.argExpr = argExpr
 
-    def __repr__(self):
-        func_repr = f"({self.funcExpr})" if isinstance(self.funcExpr, Def) else f"{self.funcExpr}"
-        arg_repr = f"({self.argExpr})" if isinstance(self.argExpr, App) or isinstance(self.argExpr, Def) else f"{self.argExpr}"
+    def __str__(self):
+        funcStr = f"({self.funcExpr})" if isinstance(self.funcExpr, Def) else f"{self.funcExpr}"
+        argStr = f"({self.argExpr})" if isinstance(self.argExpr, App) or isinstance(self.argExpr, Def) else f"{self.argExpr}"
 
-        return f"{func_repr}{arg_repr}"
+        return f"{funcStr}{argStr}"
 
 # (b)
 # i.
