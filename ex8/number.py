@@ -1,15 +1,25 @@
+# Alan Shirk
+
 class Num:
     def __init__(self,v): self.val = v
     def add(self,other): pass
 
 class Int(Num):
-    // ... need code
+    def add(self, other):
+        return self.val + int(other.val)
     
 class Str(Num):
-    // ... need code
+    def add(self, other):
+        if isinstance(other, Str):
+            return self.val + other.val
+        else:
+            return int(self.val) + int(other.val)
 
 def add(x,y):
-    // ... need code
+    if isinstance(x, Str) and isinstance(y, Str):
+        return x.val + y.val
+    else:
+        return int(x.val) + int(y.val)
 
 if __name__ == "__main__":
     ival = Int(1)
