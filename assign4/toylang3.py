@@ -182,8 +182,9 @@ class Eval(Interpreter):
     def func(self, param, body):
         return Closure(param, body, self.env)
 
-    def funcdecl(self, name, param, body):
-        closure = Closure(param, body, self.env)
+    def funcdecl(self, name, params, body):
+        param_list = [param for param in params.children]
+        closure = Closure(param_list, body, self.env)
         self.env.extend(name, closure)
 
     def body(self, *stmts):
@@ -194,12 +195,14 @@ class Eval(Interpreter):
                 return stmt_result
         self.env = self.env.closeScope()
 
-    def call(self, func_expr, arg_expr):
+    def call(self, func_expr, args_expr):
         closure = self.visit(func_expr)
-        arg_value = self.visit(arg_expr)
+        arg_values = [self.visit(arg) for arg in args_expr.children]
 
         self.env = closure.env.openScope()
-        self.env.extend(closure.id, arg_value)
+        for param, arg in zip(closure.ids, arg_values):
+            self.env.extend(param, arg)
+        
         return_value = self.visit(closure.body)
         self.env = self.env.closeScope()
 
