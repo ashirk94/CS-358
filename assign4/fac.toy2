@@ -1,0 +1,12 @@
+{ 
+  def fac(n) = {
+    var total = 1;
+    while (n > 1) {
+      total = total * n;
+      n = n - 1
+    };
+    return total
+  };
+  print(fac(5));
+  print(fac(10))
+}

@@ -1,9 +1,9 @@
 # Alan Shirk
 #
 
-# CS358 Fall'24 Assignment 4 (Part A)
+# CS358 Fall'24 Assignment 4 (Part B)
 #
-# ToyLang - an imperative language with lambda functions
+# ToyLang2
 #
 #   prog -> stmt
 #
@@ -33,17 +33,30 @@ from lark.visitors import Interpreter
 grammar = """
   ?start: stmt
 
-   stmt: "var" ID "=" expr         -> decl
-       | "print" "(" expr ")"      -> prstmt
-       | "{" stmt (";" stmt)* "}"  -> block      
+  stmt: "var" ID "=" expr             -> decl
+       | "def" ID "(" ID ")" "=" body -> funcdecl
+       | ID "=" expr                  -> assign
+       | "if" "(" expr ")" stmt ["else" stmt] -> ifstmt
+       | "while" "(" expr ")" stmt    -> whstmt
+       | "print" "(" expr ")"         -> prstmt
+       | "{" stmt (";" stmt)* "}"     -> block
+       | "return" expr                -> returnstmt
 
-  ?expr: "lambda" ID ":" expr      -> func
-       | expr "(" expr ")"         -> call
-       | aexpr 
+  body: "{" (stmt ";")* "return" expr "}"
+
+  ?expr: "lambda" ID ":" expr    -> func
+       | expr "(" expr ")"       -> call
+       | relexpr
+
+  ?relexpr: aexpr "<" aexpr -> lt
+       | aexpr "==" aexpr   -> eq
+       | aexpr "!=" aexpr   -> neq
+       | aexpr ">" aexpr    -> gt
+       | aexpr
 
   ?aexpr: aexpr "+" term  -> add
-       |  aexpr "-" term  -> sub
-       |  term         
+       | aexpr "-" term   -> sub
+       | term         
 
   ?term: term "*" atom  -> mul
        | term "/" atom  -> div
@@ -59,21 +72,20 @@ grammar = """
   %ignore WS
 """
 
+
 parser = Lark(grammar, parser='lalr')
 
 # Variable environment
 #
 class Env(dict):
-    prev = []
+    def __init__(self, prev=None):
+        self.prev = prev
 
     def openScope(self):
-        Env.prev.append(self)
-        return Env()
+        return Env(prev=self)
 
     def closeScope(self):
-        if not Env.prev:
-            raise Exception("No scope to close")
-        return Env.prev.pop()
+        return self.prev
 
     def extend(self, x, v):
         if x in self:
@@ -83,20 +95,20 @@ class Env(dict):
     def lookup(self, x):
         if x in self:
             return self[x]
-        for env in reversed(Env.prev):
-            if x in env:
-                return env[x]
-        raise Exception(f"Undefined variable: {x}")
+        elif self.prev is not None:
+            return self.prev.lookup(x)
+        else:
+            raise Exception(f"Undefined variable: {x}")
 
     def update(self, x, v):
         if x in self:
             self[x] = v
             return
-        for env in reversed(Env.prev):
-            if x in env:
-                env[x] = v
-                return
-        raise Exception(f"Undefined variable: {x}")
+        elif self.prev is not None:
+            self.prev.update(x, v)
+            return
+        else:
+            raise Exception(f"Undefined variable: {x}")
 
     def display(self, msg):
         print(msg, self, self.prev)
@@ -139,8 +151,24 @@ class Eval(Interpreter):
     def decl(self, name, value):
         self.env.extend(name, self.visit(value))
 
+    def assign(self, name, value):
+        self.env.update(name, self.visit(value))
+
+    def ifstmt(self, cond, then_stmt, else_stmt=None):
+        if self.visit(cond):
+            self.visit(then_stmt)
+        elif else_stmt:
+            self.visit(else_stmt)
+
+    def whstmt(self, cond, body):
+        while self.visit(cond):
+            self.visit(body)
+
     def prstmt(self, expr):
         print(self.visit(expr))
+
+    def returnstmt(self, expr):
+        return self.visit(expr)
 
     def block(self, *stmts):
         self.env = self.env.openScope()
@@ -151,20 +179,40 @@ class Eval(Interpreter):
     def func(self, param, body):
         return Closure(param, body, self.env)
 
-    def call(self, func, arg):
-        closure = self.visit(func)
-        arg_value = self.visit(arg)
+    def funcdecl(self, name, param, body):
+        closure = Closure(param, body, self.env)
+        self.env.extend(name, closure)
 
-        new_env = closure.env.openScope()
-        new_env.extend(closure.id, arg_value)
+    def body(self, *stmts):
+        self.env = self.env.openScope()
+        for stmt in stmts:
+            stmt_result = self.visit(stmt)
+            if stmt_result is not None:
+                return stmt_result
+        self.env = self.env.closeScope()
 
-        previous_env = self.env
-        self.env = new_env
+    def call(self, func_expr, arg_expr):
+        closure = self.visit(func_expr)
+        arg_value = self.visit(arg_expr)
 
-        result = self.visit(closure.body)
+        self.env = closure.env.openScope()
+        self.env.extend(closure.id, arg_value)
+        return_value = self.visit(closure.body)
+        self.env = self.env.closeScope()
 
-        self.env = previous_env
-        return result
+        return return_value
+
+    def lt(self, left, right):
+        return self.visit(left) < self.visit(right)
+
+    def eq(self, left, right):
+        return self.visit(left) == self.visit(right)
+
+    def neq(self, left, right):
+        return self.visit(left) != self.visit(right)
+
+    def gt(self, left, right):
+        return self.visit(left) > self.visit(right)
 
 import sys
 def main():
