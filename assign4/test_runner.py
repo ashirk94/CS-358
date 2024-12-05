@@ -3,7 +3,7 @@ import subprocess
 
 # Path to the test directory and the ToyLang interpreter
 TEST_DIR = "tst"
-INTERPRETER = "toylang2.py"
+INTERPRETER = "toylang3.py"
 
 def run_test(file_path):
     try:
