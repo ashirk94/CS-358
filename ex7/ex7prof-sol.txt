@@ -1,0 +1,44 @@
+#------------------------------------------------------------------------------ 
+# For CS358 Principles of Programming Languages, Portland State University (JL)
+#------------------------------------------------------------------------------ 
+
+# Exercise 7 Solutions
+#
+
+1.(a) class lamCal: pass                                   
+      class var(lamCal):                                  
+           def __init__(self,name): self.name = name      
+       class def(lamCal):                                 
+           def __init__(self,x,e): self.x = x; self.e = e
+       class app(lamCal):                                 
+           def __init__(self,f,e): self.f = f; self.e = e
+
+  (b) def('x',def('y',app(var('x'),var('y'))))
+     app(def('x',app(var('x'),var('x'))),var('y'))}
+
+2.(a) (1) A's constructor will be called; program prints 2; 
+      (2) C's constructor overrides A's; program prints 1.
+
+  (b) Python follows a specific Method Resolution Order (MRO) in
+  	  resolving constructor invocation order in multiple inheritance
+  	  cases. Even though super().__init__() is invoked in B1's
+  	  constructor, its parent A's constructor won't be invoked next;
+  	  rather its sibling B2's constructor will be. Furthermore, each
+  	  constructor is invoked at most once. So even though both B1 and
+  	  B2 invoke their parent's A}' constructor, it's only going to
+  	  execute once.
+
+  (c) Following the MRO, the output should be 4,2,3,1.
+
+3.(a) public class A {
+          int f(int i) { ... }
+          double f(double d) { ... }
+      }
+
+  (b) public class A {
+          int f(int i) { ... }
+      }
+      public class B extends A {
+          int f(int i) { ... }
+      }
+

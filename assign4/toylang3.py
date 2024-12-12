@@ -81,37 +81,30 @@ parser = Lark(grammar, parser='lalr')
 # Variable environment
 #
 class Env(dict):
-    def __init__(self, prev=None):
-        self.prev = prev
+    prev = []
 
     def openScope(self):
-        return Env(prev=self)
-
+        self.prev.insert(0,self)
+        return Env()
+    
     def closeScope(self):
-        return self.prev
-
-    def extend(self, x, v):
-        if x in self:
-            raise Exception(f"Variable '{x}' is already defined in the current scope")
+        return self.prev.pop(0)
+    
+    def extend(self,x,v): 
+        assert not x in self, "Variable already defined: " + x
         self[x] = v
 
-    def lookup(self, x):
-        if x in self:
-            return self[x]
-        elif self.prev is not None:
-            return self.prev.lookup(x)
-        else:
-            raise Exception(f"Undefined variable: {x}")
-
-    def update(self, x, v):
-        if x in self:
-            self[x] = v
-            return
-        elif self.prev is not None:
-            self.prev.update(x, v)
-            return
-        else:
-            raise Exception(f"Undefined variable: {x}")
+    def lookup(self,x): 
+        if x in self: return self[x]
+        for envi in self.prev:
+            if x in envi: return envi[x]
+        raise Exception("Variable undefined: " + x)
+    
+    def update(self,x,v):
+        if x in self: self[x] = v; return
+        for envi in self.prev:
+            if x in envi: envi[x] = v; return
+        raise Exception("Variable undefined: " + x)
 
     def display(self, msg):
         print(msg, self, self.prev)

@@ -1,0 +1,38 @@
+#------------------------------------------------------------------------------ 
+# For CS358 Principles of Programming Languages, Portland State University (JL)
+#------------------------------------------------------------------------------ 
+
+# Exercise 8 Solutions
+#
+
+1. (a) 1 + "2"
+   (b) def f(x): pass / f(1,2)
+   (c) i:int = "2"
+   (d) class A: pass / a = A(); print(a.x)
+
+2. (1) print([1][1])
+   (2) print(1/0)
+
+3.
+def add(x,y):
+    match x,y:
+        case Int(),Int(): return x.val + y.val
+        case Int(),Str(): return x.val + int(y.val)
+        case Str(),Int(): return int(x.val) + y.val
+        case Str(),Str(): return x.val + y.val
+
+4.
+class Num:
+    def __init__(self,v): self.val = v
+
+class Int(Num):
+    def add(self,other):    return other.addInt(self)
+    def addInt(self,other): return other.val + self.val
+    def addStr(self,other): return int(other.val) + self.val
+    
+class Str(Num):
+    def add(self,other):    return other.addStr(self)
+    def addInt(self,other): return other.val + int(self.val)
+    def addStr(self,other): return other.val + self.val
+
+

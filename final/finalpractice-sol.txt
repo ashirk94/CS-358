@@ -1,0 +1,74 @@
+Final Practice Solutions
+
+1.(a) A higher-order function is one that takes a function as its
+   argument and/or returns a function as its result.  A function is
+   pure if its value depends only on its arguments, and it has no side
+   effects.  We say a language supports "first-class" functions, if
+   functions are treated as flexibly as primitive types, such as
+   integers.
+
+  (b) Advantages: We can transform programs using equational reasoning;
+   program execution can be more flexible about evaluation order.
+   Disadvantages: Data structures need to be (at least partially)
+   copied rather than updated in place, which can make programs less
+   efficient in time and space.
+
+  (c) def threepeat(f): return compose(f,twice(f))
+      def quard(f):     return twice(twice(f))
+      def fivepeat(f):  return compose(f,twice(twice(f)))
+
+2.(a) def sizeT(s):
+       def f(s,a):
+     	   if not s: return a
+     	   else:     return f(s[1:],1+a)
+       return f(s,0)
+
+  (b) def fibI(n):		
+	    a,b = 1,1			
+	    while n > 2:		
+	      a,b = a+b,a	
+	      n = n - 1		
+	    return a          
+
+3. In the max macro, the selected operand is evaluated twice. If there
+   is side-effect, it may produce a different result than the function
+   version. In the select macro, either a or b is evaluated, while in
+   the function version, both are always evaluated.
+
+4.(a) "after the function returns"
+  (b) x == 1
+
+5.(a) There is a type error at line 9: x is an integer but is used as
+   a boolean.
+  (b) There is an initialization error at line 6: x is used before it
+   is fully initialized  V it is initialized only in one of if's two
+   branches. Compiler in general cannot reason on values.
+
+6.(a) - An array length expression 'e.len' has type int if e has type
+        array(t) for some t.
+      - An array element expression 'e1[e2]' has type t if e1 has type
+        array(t) and e2 has type int.  Semantically, this expression
+        is undefined if e2  s value is negative or larger than e1.len.
+
+  (b) - Array size needs to be nonnegative in array constructor
+        expression.
+      - Array bound needs to be checked for array element expression.
+
+7.(a) Multiple methods in the same scope have an overload relationship
+   if they have the same name and statically distinguishable parameters. 
+   A subclass method overrides a base class method if they have an
+   identical type signature. Yes, a method can simultaneously be in an
+   overloading relationship with one method and an overriding
+   relationship with another method.
+
+  (b) i. overloading  
+      ii. compiler
+      iii. (1) compile-time error
+		   (2) Base string
+		   (3) compile-time error
+		   (4) Sub string
+		   (5) Base noarg
+		   (6) Sub string
+
+8.(a) F, T, T, F 
+  (b) Operational, axiomatic, denotational

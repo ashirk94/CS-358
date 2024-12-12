@@ -63,35 +63,27 @@ class Env(dict):
     prev = []
 
     def openScope(self):
-        Env.prev.append(self)
+        self.prev.insert(0,self)
         return Env()
-
+    
     def closeScope(self):
-        top_env = Env.prev.pop()
-        return Env(top_env)
-
-    def extend(self, x, v):
-        if x in self:
-            raise Exception(f"Variable '{x}' is already defined in the current scope")
+        return self.prev.pop(0)
+    
+    def extend(self,x,v): 
+        assert not x in self, "Variable already defined: " + x
         self[x] = v
 
-    def lookup(self, x):
-        if x in self:
-            return self[x]
-        for env in reversed(Env.prev):
-            if x in env:
-                return env[x]
-        raise Exception(f"Undefined variable: {x}")
-
-    def update(self, x, v):
-        if x in self:
-            self[x] = v
-            return
-        for env in reversed(Env.prev):
-            if x in env:
-                env[x] = v
-                return
-        raise Exception(f"Undefined variable: {x}")
+    def lookup(self,x): 
+        if x in self: return self[x]
+        for envi in self.prev:
+            if x in envi: return envi[x]
+        raise Exception("Variable undefined: " + x)
+    
+    def update(self,x,v):
+        if x in self: self[x] = v; return
+        for envi in self.prev:
+            if x in envi: envi[x] = v; return
+        raise Exception("Variable undefined: " + x)
 
     def display(self, msg):
         print(msg, self, self.prev)
